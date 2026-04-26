@@ -1,10 +1,11 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Heart, Headphones, LogIn, LogOut, Menu, X } from "lucide-react";
+import { Flame, Heart, Headphones, LogIn, LogOut, Menu, X } from "lucide-react";
 import { frequencies, categoryLabels, type FrequencyCategory } from "@/lib/frequencies";
 import FrequencyCard from "@/components/FrequencyCard";
 import FloatingOrbs from "@/components/FloatingOrbs";
 import { useAuth } from "@/contexts/AuthContext";
+import { updateDailyStreak } from "@/lib/streak";
 
 const FAVORITES_KEY = "mind_control_favourites";
 const LAST_LISTENED_KEY = "mind_control_last_listened";
@@ -27,6 +28,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, hasUsedFreeTrial, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [streakDays] = useState(() => updateDailyStreak());
   const [favoriteHz, setFavoriteHz] = useState<number[]>(() => {
     try {
       return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
@@ -139,6 +141,21 @@ const Index = () => {
         <p className="text-sm font-medium text-foreground">
           Sync your frequency daily for peak mental clarity
         </p>
+      </div>
+
+      <div className="container max-w-6xl mx-auto px-4 pt-3">
+        <div className="rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Flame size={18} className="text-primary" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">Daily streak</p>
+              <p className="text-xs text-muted-foreground">You have used the app for {streakDays} {streakDays === 1 ? "day" : "days"}</p>
+            </div>
+          </div>
+          <span className="rounded-lg bg-primary px-3 py-1 text-sm font-bold text-primary-foreground">
+            {streakDays}🔥
+          </span>
+        </div>
       </div>
 
       {/* Headphones tip */}
