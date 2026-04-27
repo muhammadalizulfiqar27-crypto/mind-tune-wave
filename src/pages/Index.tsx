@@ -26,7 +26,7 @@ const categoryIcons: Record<FrequencyCategory, string> = {
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, hasUsedFreeTrial, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [streakDays] = useState(() => updateDailyStreak());
   const [favoriteHz, setFavoriteHz] = useState<number[]>(() => {
@@ -47,13 +47,9 @@ const Index = () => {
 
   const handleCardTap = useCallback(
     (hz: number) => {
-      if (!user && hasUsedFreeTrial) {
-        navigate("/auth");
-        return;
-      }
       navigate(`/player/${hz}`);
     },
-    [user, hasUsedFreeTrial, navigate]
+    [navigate]
   );
 
   const toggleFavorite = useCallback((hz: number) => {
@@ -167,17 +163,6 @@ const Index = () => {
           </p>
         </div>
       </div>
-
-      {/* Free trial banner */}
-      {!user && !hasUsedFreeTrial && (
-        <div className="container max-w-6xl mx-auto px-4 pt-3">
-          <div className="rounded-lg bg-primary/10 border border-primary/20 px-4 py-2.5 text-center">
-            <p className="text-xs text-primary">
-              🎵 Try one frequency for free — create an account to unlock all 20!
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Frequency grid */}
       <main className="container max-w-6xl mx-auto px-4 py-8">
