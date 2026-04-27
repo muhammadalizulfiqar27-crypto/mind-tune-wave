@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Play, Pause, Repeat, Volume2, VolumeX } from "lucide-react";
 import { frequencies } from "@/lib/frequencies";
 import { playFrequency, stopFrequency, setVolume } from "@/lib/audioEngine";
-import { useAuth } from "@/contexts/AuthContext";
 import PlayerCanvas from "@/components/PlayerCanvas";
 
 const DURATION = 90; // seconds
@@ -12,7 +11,6 @@ const LAST_LISTENED_KEY = "mind_control_last_listened";
 const PlayerPage = () => {
   const { hz } = useParams<{ hz: string }>();
   const navigate = useNavigate();
-  const { user, hasUsedFreeTrial, markTrialUsed } = useAuth();
 
   const freq = frequencies.find((f) => f.hz === parseFloat(hz || "0"));
   const currentIndex = freq ? frequencies.findIndex((f) => f.hz === freq.hz) : -1;
@@ -43,7 +41,6 @@ const PlayerPage = () => {
     playFrequency(freq.hz, volume);
     playingRef.current = true;
     setIsPlaying(true);
-    if (!user) markTrialUsed();
 
     timerRef.current = setInterval(() => {
       setRemaining((r) => {
@@ -57,7 +54,7 @@ const PlayerPage = () => {
         return r - 1;
       });
     }, 1000);
-  }, [clearTimer, freq, markTrialUsed, user, volume]);
+  }, [clearTimer, freq, volume]);
 
   const handlePlay = useCallback(() => {
     if (playingRef.current) {
@@ -76,13 +73,6 @@ const PlayerPage = () => {
       : (currentIndex - 1 + frequencies.length) % frequencies.length;
     navigate(`/player/${frequencies[nextIndex].hz}`);
   }, [currentIndex, navigate, pausePlayback]);
-
-  // Auth gate
-  useEffect(() => {
-    if (!user && hasUsedFreeTrial) {
-      navigate("/auth", { replace: true });
-    }
-  }, [user, hasUsedFreeTrial, navigate]);
 
   useEffect(() => {
     if (!freq) return;
